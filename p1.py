@@ -185,6 +185,7 @@ class AmbulanceSimulator:
         return free_ambs
 
     def compute_taylor_series_confidence_interval(self):
+        return
 
     def run_simulation(self, debug=False, regeneration=True):
 
