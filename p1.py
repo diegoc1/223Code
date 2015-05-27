@@ -187,7 +187,7 @@ class AmbulanceSimulator:
     def compute_taylor_series_confidence_interval(self):
         return
 
-    def run_simulation(self, debug=False, regeneration=True):
+    def run_simulation(self, debug=False, regeneration=False):
 
         count = 0
         first_iter = True
@@ -327,12 +327,12 @@ class AmbulanceSimulator:
         if regeneration:
             mean_cycle_time = sum(self.regeneration_times) / len(self.regeneration_times)
             mean_num_idle = sum(self.regeneration_idle_ambulances) / len(self.regeneration_idle_ambulances)
-        print "Mean cycle time", mean_cycle_time
-        print "Mean num idle", mean_num_idle
+            print "Mean cycle time", mean_cycle_time
+            print "Mean num idle", mean_num_idle
 
-        if regeneration:
-            self.compute_taylor_series_confidence_interval(self.regeneration_times, self.regeneration_idle_ambulances)
-            return mean_num_idle / mean_cycle_time
+        # if regeneration:
+        #     self.compute_taylor_series_confidence_interval(self.regeneration_times, self.regeneration_idle_ambulances)
+        #     return mean_num_idle / mean_cycle_time
 
 
 
