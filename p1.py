@@ -184,7 +184,37 @@ class AmbulanceSimulator:
         free_ambs = sum([1 if self.get_state_of_ambulance(amb_id) == 0 else 0 for amb_id in range(1, 4)])
         return free_ambs
 
-    def compute_taylor_series_confidence_interval(self):
+    def compute_taylor_series_confidence_interval(self, X_vals, Y_vals):
+        if len(X_vals) != len(Y_vals):
+            raise Exception("Array lengths need to be the same")
+
+        num_observations = len(X_vals)
+
+        mean_X = sum(X_vals) / (1.0 *  len(X_vals))
+        mean_Y = sum(Y_vals) / (1.0 * len(Y_vals))
+
+        alpha = mean_X / (1.0 * mean_Y)
+
+        c = 1 / mean_X
+        d = -1.0 * mean_X / (mean_Y ** 2)
+
+        variance_sum = 0
+        for i in range(num_observations):
+            temp_sum_val =  (c * (X_vals[i] - mean_X) + d * (Y_vals[i] - mean_Y)) ** 2
+
+            variance_sum += temp_sum_val
+
+        variance_sum /= (1.0 * (num_observations - 1))
+
+        std_dev = math.sqrt(variance_sum)
+
+        z = 1.96
+        lower_conf_intvl = alpha - (z * std_dev) / (1.0 * math.sqrt(num_observations))
+        upper_conf_intvl = alpha + (z * std_dev) / (1.0 * math.sqrt(num_observations))
+
+        print "lower_conf_intvl", lower_conf_intvl
+        print "upper_conf_intvl", upper_conf_intvl
+        print "alpha", alpha
         return
 
     def run_simulation(self, debug=False, regeneration=False):
@@ -329,10 +359,8 @@ class AmbulanceSimulator:
             mean_num_idle = sum(self.regeneration_idle_ambulances) / len(self.regeneration_idle_ambulances)
             print "Mean cycle time", mean_cycle_time
             print "Mean num idle", mean_num_idle
-
-        # if regeneration:
-        #     self.compute_taylor_series_confidence_interval(self.regeneration_times, self.regeneration_idle_ambulances)
-        #     return mean_num_idle / mean_cycle_time
+            self.compute_taylor_series_confidence_interval(self.regeneration_times, self.regeneration_idle_ambulances)
+            return mean_num_idle / mean_cycle_time
 
 
 
@@ -377,13 +405,18 @@ if __name__ == "__main__":
     if not sysargs.trial: unigen.init_generator(1, clcg4.NEW_SEED)
 
     list_of_values = []
+    list_of_squared_values = []
     # run simulation repetitions and collect stats
     for rep in range(int(sysargs.num)):
         print "rep", rep
         val = do_rep(unigen, est)
         list_of_values.append(val)
+        list_of_squared_values.append(val**2)
         verbose_print(1, "Repetition", rep+1, " : %.2f" %val, "\n\n")
 
+
+    ###list_of_values#####
+    ###list_of_squared_values####
 
     def perform_sectioning(num_sections=5, num_observations=100, inner_quartile=.25, outer_quartile=.75):
 
